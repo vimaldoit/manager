@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "855346823724",
+    "project_id": "todo-92deb",
+    "storage_bucket": "todo-92deb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:855346823724:android:274275d11e92ec16fe8789",
+        "android_client_info": {
+          "package_name": "com.example.taskmanager"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATvUqOvYOqwLcY0k1lfynFBbwkCw5xn0s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:855346823724:android:3a9e9da886f864d1fe8789",
+        "android_client_info": {
+          "package_name": "com.tdevelopers.stumagz"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATvUqOvYOqwLcY0k1lfynFBbwkCw5xn0s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:855346823724:android:a9a2cb804d52e345fe8789",
+        "android_client_info": {
+          "package_name": "com.todo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATvUqOvYOqwLcY0k1lfynFBbwkCw5xn0s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
