@@ -4,35 +4,46 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taskmanager/core/router/app_router.dart';
 import 'package:taskmanager/core/theme/app_colors.dart';
 import 'package:taskmanager/core/theme/app_theme.dart';
-import 'package:taskmanager/features/project/presentation/bloc/project_bloc.dart';
-import 'package:taskmanager/features/project/presentation/widgets/project_card.dart';
-import 'package:taskmanager/features/project/presentation/widgets/add_project_dialog.dart';
+import 'package:taskmanager/features/task/domain/entities/task_entity.dart';
+import 'package:taskmanager/features/task/presentation/bloc/task_bloc.dart';
+import 'package:taskmanager/features/task/presentation/bloc/task_event.dart';
+import 'package:taskmanager/features/task/presentation/bloc/task_state.dart';
+import 'package:taskmanager/features/task/presentation/widgets/task_item.dart';
+import 'package:taskmanager/features/task/presentation/widgets/task_dialog.dart';
 
-class ProjectsScreen extends StatefulWidget {
-  const ProjectsScreen({super.key});
+class TaskListScreen extends StatefulWidget {
+  final String projectId;
+
+  const TaskListScreen({super.key, required this.projectId});
 
   @override
-  State<ProjectsScreen> createState() => _ProjectsScreenState();
+  State<TaskListScreen> createState() => _TaskListScreenState();
 }
 
-class _ProjectsScreenState extends State<ProjectsScreen> {
-  @override
-  void initState() {
-    super.initState();
-    context.read<ProjectBloc>().add(GetProjectsEvent());
-  }
-
-  void _showAddProjectDialog() {
+class _TaskListScreenState extends State<TaskListScreen> {
+  void _showTaskDialog([TaskEntity? task]) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (contextt) => AddProjectDialog(
-        onAdd: (project) {
-          context.read<ProjectBloc>().add(CreateProjectEvent(project));
+      builder: (contextt) => TaskDialog(
+        projectId: widget.projectId,
+        task: task,
+        onSave: (updatedTask) {
+          if (task == null) {
+            context.read<TaskBloc>().add(CreateTaskEvent(updatedTask));
+          } else {
+            context.read<TaskBloc>().add(UpdateTaskEvent(updatedTask));
+          }
         },
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<TaskBloc>().add(GetTasksEvent(widget.projectId));
   }
 
   Future<bool?> _showDeleteConfirmation(
@@ -61,25 +72,25 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("My Projects"),
+        title: const Text("Tasks"),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.dashboard_outlined),
             onPressed: () {
-              context.read<ProjectBloc>().add(GetProjectsEvent());
+              AppRouter.pushKanban(context, widget.projectId);
             },
           ),
         ],
       ),
-      body: BlocConsumer<ProjectBloc, ProjectState>(
+      body: BlocConsumer<TaskBloc, TaskState>(
         listener: (context, state) {
-          if (state is ProjectOperationSuccess) {
+          if (state is TaskOperationSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                   content: Text(state.message),
                   backgroundColor: AppColors.success),
             );
-          } else if (state is ProjectError) {
+          } else if (state is TaskError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                   content: Text(state.message),
@@ -88,25 +99,25 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           }
         },
         builder: (context, state) {
-          if (state is ProjectLoading) {
+          if (state is TaskLoading) {
             return const Center(child: CircularProgressIndicator());
-          } else if (state is ProjectsLoaded) {
-            if (state.projects.isEmpty) {
+          } else if (state is TasksLoaded) {
+            if (state.tasks.isEmpty) {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.folder_open,
+                    Icon(Icons.checklist,
                         size: 64.sp, color: AppColors.textSecondary),
                     SizedBox(height: 16.h),
                     Text(
-                      "No projects yet",
+                      "No tasks for this project",
                       style: AppTheme.bodyText2
                           .copyWith(color: AppColors.textSecondary),
                     ),
                     SizedBox(height: 8.h),
                     Text(
-                      "Tap + to create your first project",
+                      "Tap + to add your first task",
                       style: AppTheme.bodyText3
                           .copyWith(color: AppColors.textSecondary),
                     ),
@@ -116,26 +127,27 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             }
             return ListView.separated(
               padding: EdgeInsets.all(16.w),
-              itemCount: state.projects.length,
-              separatorBuilder: (context, index) => SizedBox(height: 12.h),
+              itemCount: state.tasks.length,
+              separatorBuilder: (context, index) => SizedBox(height: 8.h),
               itemBuilder: (context, index) {
-                final project = state.projects[index];
-                return ProjectCard(
-                  project: project,
-                  onTap: () {
-                    AppRouter.pushTasks(context, project.id);
-                  },
+                final task = state.tasks[index];
+                return TaskItem(
+                  task: task,
                   onDelete: () async {
                     final confirmed = await _showDeleteConfirmation(
                       context,
-                      "Delete Project",
-                      "Are you sure you want to delete '${project.name}'? All associated tasks will also be deleted.",
+                      "Delete Task",
+                      "Are you sure you want to delete this task?",
                     );
                     if (confirmed == true && context.mounted) {
-                      context
-                          .read<ProjectBloc>()
-                          .add(DeleteProjectEvent(project.id));
+                      context.read<TaskBloc>().add(DeleteTaskEvent(
+                            taskId: task.id,
+                            projectId: widget.projectId,
+                          ));
                     }
+                  },
+                  onEdit: () {
+                    _showTaskDialog(task);
                   },
                 );
               },
@@ -145,7 +157,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _showAddProjectDialog,
+        onPressed: () => _showTaskDialog(),
         child: const Icon(Icons.add),
       ),
     );

@@ -18,6 +18,14 @@ import 'package:taskmanager/features/project/domain/usecases/get_project_by_id_u
 import 'package:taskmanager/features/project/domain/usecases/get_projects_usecase.dart';
 import 'package:taskmanager/features/project/domain/usecases/update_project_usecase.dart';
 import 'package:taskmanager/features/project/presentation/bloc/project_bloc.dart';
+import 'package:taskmanager/features/task/data/datasources/task_remote_data_source.dart';
+import 'package:taskmanager/features/task/data/repositories/task_repository_impl.dart';
+import 'package:taskmanager/features/task/domain/repositories/task_repository.dart';
+import 'package:taskmanager/features/task/domain/usecases/create_task_usecase.dart';
+import 'package:taskmanager/features/task/domain/usecases/delete_task_usecase.dart';
+import 'package:taskmanager/features/task/domain/usecases/get_tasks_usecase.dart';
+import 'package:taskmanager/features/task/domain/usecases/update_task_usecase.dart';
+import 'package:taskmanager/features/task/presentation/bloc/task_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -44,6 +52,15 @@ Future<void> init() async {
     ),
   );
 
+  sl.registerFactory(
+    () => TaskBloc(
+      getTasksUseCase: sl(),
+      createTaskUseCase: sl(),
+      updateTaskUseCase: sl(),
+      deleteTaskUseCase: sl(),
+    ),
+  );
+
   // Use cases
   sl.registerLazySingleton(() => LoginUseCase(sl()));
   sl.registerLazySingleton(() => SignUpUseCase(sl()));
@@ -56,6 +73,11 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetProjectsUseCase(sl()));
   sl.registerLazySingleton(() => UpdateProjectUseCase(sl()));
 
+  sl.registerLazySingleton(() => CreateTaskUseCase(sl()));
+  sl.registerLazySingleton(() => GetTasksUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateTaskUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteTaskUseCase(sl()));
+
   // Repository
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(sl()),
@@ -65,6 +87,10 @@ Future<void> init() async {
     () => ProjectRepositoryImpl(sl()),
   );
 
+  sl.registerLazySingleton<TaskRepository>(
+    () => TaskRepositoryImpl(sl()),
+  );
+
   // Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(sl()),
@@ -72,6 +98,10 @@ Future<void> init() async {
 
   sl.registerLazySingleton<ProjectRemoteDataSource>(
     () => ProjectRemoteDataSourceImpl(sl()),
+  );
+
+  sl.registerLazySingleton<TaskRemoteDataSource>(
+    () => TaskRemoteDataSourceImpl(sl()),
   );
 
   // External
