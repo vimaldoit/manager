@@ -114,31 +114,33 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 ),
               );
             }
-            return ListView.separated(
-              padding: EdgeInsets.all(16.w),
-              itemCount: state.projects.length,
-              separatorBuilder: (context, index) => SizedBox(height: 12.h),
-              itemBuilder: (context, index) {
-                final project = state.projects[index];
-                return ProjectCard(
-                  project: project,
-                  onTap: () {
-                    AppRouter.pushTasks(context, project.id);
-                  },
-                  onDelete: () async {
-                    final confirmed = await _showDeleteConfirmation(
-                      context,
-                      "Delete Project",
-                      "Are you sure you want to delete '${project.name}'? All associated tasks will also be deleted.",
-                    );
-                    if (confirmed == true && context.mounted) {
-                      context
-                          .read<ProjectBloc>()
-                          .add(DeleteProjectEvent(project.id));
-                    }
-                  },
-                );
-              },
+            return RepaintBoundary(
+              child: ListView.separated(
+                padding: EdgeInsets.all(16.w),
+                itemCount: state.projects.length,
+                separatorBuilder: (context, index) => SizedBox(height: 12.h),
+                itemBuilder: (context, index) {
+                  final project = state.projects[index];
+                  return ProjectCard(
+                    project: project,
+                    onTap: () {
+                      AppRouter.pushTasks(context, project.id);
+                    },
+                    onDelete: () async {
+                      final confirmed = await _showDeleteConfirmation(
+                        context,
+                        "Delete Project",
+                        "Are you sure you want to delete '${project.name}'? All associated tasks will also be deleted.",
+                      );
+                      if (confirmed == true && context.mounted) {
+                        context
+                            .read<ProjectBloc>()
+                            .add(DeleteProjectEvent(project.id));
+                      }
+                    },
+                  );
+                },
+              ),
             );
           }
           return const SizedBox.shrink();

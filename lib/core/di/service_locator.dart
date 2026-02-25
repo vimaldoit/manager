@@ -29,7 +29,7 @@ import 'package:taskmanager/features/task/presentation/bloc/task_bloc.dart';
 
 final sl = GetIt.instance;
 
-Future<void> init() async {
+void init() {
   // Features - Auth
   // BLoC
   sl.registerFactory(

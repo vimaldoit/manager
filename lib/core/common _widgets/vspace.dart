@@ -7,6 +7,6 @@ class Vspace extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(height: ScreenUtil().setHeight(vspace));
+    return SizedBox(height: vspace.h);
   }
 }

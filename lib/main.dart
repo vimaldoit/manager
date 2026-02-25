@@ -12,7 +12,9 @@ import 'package:taskmanager/firebase_options.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await di.init();
+  di.init();
+  // Pre-warm Google Fonts
+  GoogleFonts.inter();
   runApp(const MyApp());
 }
 
